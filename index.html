@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>罗杰疑案 - 人物关系图 (无剧透)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            /* Slate 900 */
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        #graph-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .node circle {
+            stroke: #fff;
+            stroke-width: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .node:hover circle {
+            stroke: #fcd34d;
+            /* Amber 300 */
+            stroke-width: 4px;
+            filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.6));
+        }
+
+        .node text {
+            font-size: 12px;
+            pointer-events: none;
+            text-shadow: 2px 2px 4px #000;
+            fill: #e2e8f0;
+        }
+
+        .link {
+            stroke: #475569;
+            stroke-opacity: 0.6;
+            stroke-width: 1.5px;
+        }
+
+        /* Information Panel */
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            width: 90%;
+            max-width: 600px;
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 10;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        #info-panel.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #94a3b8;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* Tooltip style for link relationships */
+        .link-label {
+            font-size: 10px;
+            fill: #94a3b8;
+            background: #0f172a;
+        }
+
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- UI Overlay -->
+    <div class="absolute top-0 left-0 p-4 z-10 w-full pointer-events-none">
+        <div class="flex justify-between items-start pointer-events-auto">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-amber-500 tracking-wider font-serif">罗杰疑案</h1>
+                <h2 class="text-sm md:text-base text-slate-400 italic">The Murder of Roger Ackroyd</h2>
+                <p class="text-xs text-slate-500 mt-1">无剧透人物关系图 | Spoiler-Free Character Map</p>
+            </div>
+
+            <!-- Legend -->
+            <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 text-xs md:text-sm backdrop-blur-sm">
+                <div class="flex items-center mb-1"><span class="legend-dot bg-red-600"></span>中心人物 (Center)</div>
+                <div class="flex items-center mb-1"><span class="legend-dot bg-purple-600"></span>亲属/客人 (Family/Guest)
+                </div>
+                <div class="flex items-center mb-1"><span class="legend-dot bg-gray-500"></span>家仆/职员 (Staff)</div>
+                <div class="flex items-center"><span class="legend-dot bg-blue-500"></span>侦探/旁观 (Detective/Local)</div>
+            </div>
+        </div>
+        <div class="mt-4 text-xs text-slate-400 bg-slate-800/50 inline-block px-2 py-1 rounded pointer-events-auto">
+            <span class="mr-1">💡</span> 提示：拖拽节点整理关系，点击节点查看详情。<br>Tip: Drag nodes to organize, Click for details.
+        </div>
+    </div>
+
+    <!-- Graph Container -->
+    <div id="graph-container"></div>
+
+    <!-- Detail Panel -->
+    <div id="info-panel">
+        <span class="close-btn" onclick="closePanel()">&times;</span>
+        <div id="panel-content">
+            <h3 id="char-name" class="text-xl font-bold text-amber-400 mb-1">Character Name</h3>
+            <p id="char-name-en" class="text-sm text-slate-400 italic mb-3">English Name</p>
+            <div class="border-t border-slate-600 my-2"></div>
+            <p id="char-desc" class="text-sm leading-relaxed text-slate-200">Description goes here.</p>
+            <div class="mt-3">
+                <span id="char-role" class="text-xs font-mono bg-slate-700 px-2 py-1 rounded text-slate-300">Role</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Configuration
+        // Groups: 1: Center, 2: Family/Guest, 3: Staff, 4: Detective/Local
+        const nodes = [
+            { id: "Roger", name: "罗杰·艾克罗伊德", en: "Roger Ackroyd", group: 1, role: "受害者/庄园主", desc: "芬利庄园的主人，当地极其富有的绅士。他是大家关注的中心，因为很多人都在经济上依赖他。故事开始时非常焦虑。" },
+            { id: "Poirot", name: "赫尔克里·波洛", en: "Hercule Poirot", group: 4, role: "侦探", desc: "大名鼎鼎的比利时侦探，已退休。搬到了谢泼德医生隔壁种西葫芦，试图隐姓埋名，但很快被卷入案件。" },
+            { id: "Sheppard", name: "詹姆斯·谢泼德医生", en: "Dr. James Sheppard", group: 4, role: "叙述者/医生", desc: "本书的叙述者，本地受人尊敬的医生。他和波洛是邻居，也是罗杰的朋友。他记录了整个案件的经过。" },
+            { id: "Caroline", name: "卡洛琳·谢泼德", en: "Caroline Sheppard", group: 4, role: "医生的姐姐", desc: "谢泼德医生的姐姐，和他住在一起。她是村里的八卦中心，消息极其灵通，拥有惊人的直觉。" },
+            { id: "Ralph", name: "拉尔夫·帕顿", en: "Ralph Paton", group: 2, role: "罗杰的继子", desc: "罗杰已故妻子的儿子。英俊迷人但挥霍无度，总是深陷债务危机。他是遗产的主要继承人之一，和弗洛拉有婚约。" },
+            { id: "MrsAckroyd", name: "塞西尔·艾克罗伊德太太", en: "Mrs. Cecil Ackroyd", group: 2, role: "罗杰的弟媳", desc: "罗杰已故弟弟的遗孀。带着女儿弗洛拉住在芬利庄园，在经济上完全依赖罗杰，对此经常感到不满。" },
+            { id: "Flora", name: "弗洛拉·艾克罗伊德", en: "Flora Ackroyd", group: 2, role: "罗杰的侄女", desc: "艾克罗伊德太太的女儿。年轻美丽，与拉尔夫·帕顿订了婚。她似乎也有些经济上的困扰。" },
+            { id: "Blunt", name: "赫克托·布兰特少校", en: "Major Hector Blunt", group: 2, role: "朋友/客人", desc: "著名的狩猎家和探险家，罗杰的老朋友，也是庄园的客人。性格沉默寡言，似乎对弗洛拉有好感。" },
+            { id: "Raymond", name: "杰弗里·雷蒙德", en: "Geoffrey Raymond", group: 3, role: "私人秘书", desc: "罗杰的私人秘书。年轻、能干、性格开朗，处理罗杰的各种事务。" },
+            { id: "Parker", name: "帕克", en: "Parker", group: 3, role: "管家", desc: "芬利庄园的男管家。虽然尽职，但有些行为举止在谢泼德医生看来有些可疑。" },
+            { id: "Russell", name: "拉塞尔小姐", en: "Elizabeth Russell", group: 3, role: "女管家", desc: "庄园的女管家，在这里工作了五年。据传罗杰可能想娶她，这让其他人感到不安。" },
+            { id: "Ursula", name: "厄休拉·伯恩", en: "Ursula Bourne", group: 3, role: "女侍", desc: "庄园的一名女侍，最近刚辞职（或被解雇），情绪显得很激动。" },
+            { id: "Ferrars", name: "费拉尔斯太太", en: "Mrs. Ferrars", group: 1, role: "已故寡妇", desc: "故事开始前刚去世的人物。罗杰的情人。她的自杀（以及她是否谋杀了亡夫的传言）是引发整个事件的导火索。" }
+        ];
+
+        const links = [
+            { source: "Sheppard", target: "Poirot", label: "邻居/助手" },
+            { source: "Sheppard", target: "Roger", label: "医生/朋友" },
+            { source: "Sheppard", target: "Caroline", label: "姐弟" },
+            { source: "Sheppard", target: "Ferrars", label: "医生" },
+
+            { source: "Roger", target: "Ferrars", label: "秘密情人" },
+            { source: "Roger", target: "Ralph", label: "继父子" },
+            { source: "Roger", target: "MrsAckroyd", label: "供养" },
+            { source: "Roger", target: "Flora", label: "伯父/供养" },
+            { source: "Roger", target: "Blunt", label: "老友" },
+            { source: "Roger", target: "Raymond", label: "雇主" },
+            { source: "Roger", target: "Parker", label: "雇主" },
+            { source: "Roger", target: "Russell", label: "雇主/暧昧?" },
+            { source: "Roger", target: "Ursula", label: "雇主" },
+
+            { source: "Ralph", target: "Flora", label: "未婚夫妻" },
+            { source: "MrsAckroyd", target: "Flora", label: "母女" },
+            { source: "Blunt", target: "Flora", label: "暗恋?" },
+
+            { source: "Russell", target: "Ursula", label: "上下级" },
+            { source: "Parker", target: "Ursula", label: "同事" },
+
+            { source: "Caroline", target: "Poirot", label: "好奇/观察" }
+        ];
+
+        // Color Mapping
+        const colorScale = d3.scaleOrdinal()
+            .domain([1, 2, 3, 4])
+            .range(["#dc2626", "#9333ea", "#64748b", "#3b82f6"]);
+        // Red (Victim/Key), Purple (Family), Slate (Staff), Blue (Detective)
+
+        // Setup SVG
+        const container = document.getElementById('graph-container');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        const svg = d3.select("#graph-container")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .call(d3.zoom().on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            }))
+            .append("g");
+
+        const g = svg.append("g");
+
+        // Simulation
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+            .force("charge", d3.forceManyBody().strength(-600))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collide", d3.forceCollide().radius(60));
+
+        // Draw Links
+        const link = g.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(links)
+            .enter().append("line")
+            .attr("class", "link");
+
+        // Draw Nodes
+        const node = g.append("g")
+            .attr("class", "nodes")
+            .selectAll("g")
+            .data(nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended))
+            .on("click", (event, d) => showInfo(d));
+
+        // Node Circles
+        node.append("circle")
+            .attr("r", d => d.group === 1 ? 35 : (d.group === 4 ? 30 : 25)) // Larger for central/detective
+            .attr("fill", d => colorScale(d.group))
+            .attr("stroke", "#1e293b")
+            .attr("stroke-width", 2);
+
+        // Node Initials (Optional visual aid)
+        node.append("text")
+            .attr("dy", 5)
+            .attr("text-anchor", "middle")
+            .style("fill", "white")
+            .style("font-weight", "bold")
+            .style("font-size", d => d.group === 1 ? "14px" : "12px")
+            .style("pointer-events", "none")
+            .text(d => d.name.substring(0, 1)); // First Chinese character
+
+        // Node Labels (Full Name below)
+        node.append("text")
+            .attr("dy", d => d.group === 1 ? 55 : 45)
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .style("fill", "#cbd5e1")
+            .text(d => d.name);
+
+        // Simulation Tick
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+
+        // Functions
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        function showInfo(d) {
+            const panel = document.getElementById('info-panel');
+
+            // Populate Data
+            document.getElementById('char-name').innerText = d.name;
+            document.getElementById('char-name-en').innerText = d.en;
+            document.getElementById('char-desc').innerText = d.desc;
+            document.getElementById('char-role').innerText = d.role;
+
+            // Set accent color based on group
+            const color = colorScale(d.group);
+            document.getElementById('char-name').style.color = color;
+            document.getElementById('char-role').style.borderColor = color;
+            document.getElementById('char-role').style.color = "#fff"; // Reset to white text
+
+            // Show Panel
+            panel.classList.add('active');
+
+            // Optional: Center view on node (smoothly)
+            // Note: This requires complex transform calculation, skipping for simplicity to keep user control.
+        }
+
+        function closePanel() {
+            document.getElementById('info-panel').classList.remove('active');
+        }
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            svg.attr("width", width).attr("height", height);
+            simulation.force("center", d3.forceCenter(width / 2, height / 2));
+            simulation.alpha(0.3).restart();
+        });
+
+        // Initial background click to close panel
+        svg.on("click", (event) => {
+            if (event.target.tagName === 'svg') {
+                closePanel();
+            }
+        });
+
+    </script>
+</body>
+
+</html>
