@@ -17,7 +17,15 @@
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-amber-500 tracking-wider font-serif">罗杰疑案</h1>
                 <h2 class="text-sm md:text-base text-slate-400 italic">The Murder of Roger Ackroyd</h2>
-                <p class="text-xs text-slate-500 mt-1">无剧透人物关系图 | Spoiler-Free Character Map</p>
+                <p id="subtitle" class="text-xs text-slate-500 mt-1 transition-all duration-300">无剧透人物关系图 | Spoiler-Free
+                    Character Map</p>
+
+                <!-- Spoiler Toggle Button -->
+                <button id="toggle-spoiler-btn"
+                    class="mt-3 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm rounded shadow-lg border border-slate-600 transition-all duration-300 flex items-center gap-2">
+                    <span>🔍</span>
+                    <span>还原真相 (Spoiler Mode)</span>
+                </button>
             </div>
 
             <!-- Legend -->
@@ -30,6 +38,11 @@
                 </div>
                 <div class="flex items-center"><span class="legend-dot" style="background-color: #cbd5e1;"></span>已故/背景
                     (Background)</div>
+                <div class="mt-2 pt-2 border-t border-slate-600 text-amber-500 hidden" id="spoiler-legend">
+                    <div class="flex items-center"><span
+                            class="w-3 h-0.5 bg-red-500 border-b border-dashed border-red-500 mr-2"></span>秘密/真相
+                        (Secret)</div>
+                </div>
             </div>
         </div>
         <div class="mt-4 text-xs text-slate-400 bg-slate-800/50 inline-block px-2 py-1 rounded pointer-events-auto">
