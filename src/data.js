@@ -11,7 +11,9 @@ export const nodes = [
     { id: "Parker", name: "帕克", en: "Parker", group: 3, role: "管家", desc: "芬利庄园的男管家。虽然尽职，但有些行为举止在谢泼德医生看来有些可疑。" },
     { id: "Russell", name: "拉塞尔小姐", en: "Elizabeth Russell", group: 3, role: "女管家", desc: "庄园的女管家，在这里工作了五年。据传罗杰可能想娶她，这让其他人感到不安。" },
     { id: "Ursula", name: "厄休拉·伯恩", en: "Ursula Bourne", group: 3, role: "女侍", desc: "庄园的一名女侍，最近刚辞职（或被解雇），情绪显得很激动。" },
-    { id: "Ferrars", name: "费拉尔斯太太", en: "Mrs. Ferrars", group: 1, role: "已故寡妇", desc: "故事开始前刚去世的人物。罗杰的情人。她的自杀（以及她是否谋杀了亡夫的传言）是引发整个事件的导火索。" }
+    { id: "Ferrars", name: "费拉尔斯太太", en: "Mrs. Ferrars", group: 1, role: "已故寡妇", desc: "故事开始前刚去世的人物。罗杰的情人。她的自杀（以及她是否谋杀了亡夫的传言）是引发整个事件的导火索。" },
+    { id: "MrFerrars", name: "阿什利·费拉尔斯", en: "Ashley Ferrars", group: 5, role: "费拉尔斯先生", desc: "费拉尔斯太太的亡夫，一年前去世。生前是个酒鬼，性格恶劣。他的死因一直存疑，有传言说是被妻子毒死的。" },
+    { id: "FirstWife", name: "罗杰的第一任妻子", en: "Roger's First Wife", group: 5, role: "拉尔夫生母", desc: "罗杰·艾克罗伊德的第一任妻子，拉尔夫·帕顿的生母。在故事开始前很久就已经去世了。" }
 ];
 
 export const links = [
@@ -21,6 +23,7 @@ export const links = [
     { source: "Sheppard", target: "Ferrars", label: "医生" },
 
     { source: "Roger", target: "Ferrars", label: "秘密情人" },
+    { source: "Roger", target: "FirstWife", label: "前妻" },
     { source: "Roger", target: "Ralph", label: "继父子" },
     { source: "Roger", target: "MrsAckroyd", label: "供养" },
     { source: "Roger", target: "Flora", label: "伯父/供养" },
@@ -36,6 +39,9 @@ export const links = [
 
     { source: "Russell", target: "Ursula", label: "上下级" },
     { source: "Parker", target: "Ursula", label: "同事" },
+
+    { source: "Ferrars", target: "MrFerrars", label: "亡夫" },
+    { source: "Ralph", target: "FirstWife", label: "母子" },
 
     { source: "Caroline", target: "Poirot", label: "好奇/观察" }
 ];

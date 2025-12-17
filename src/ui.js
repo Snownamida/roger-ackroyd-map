@@ -18,7 +18,8 @@ export function showInfo(d) {
         1: "#dc2626",
         2: "#9333ea",
         3: "#64748b",
-        4: "#3b82f6"
+        4: "#3b82f6",
+        5: "#cbd5e1"
     };
 
     const color = colors[d.group] || "#94a3b8";

@@ -4,8 +4,8 @@ import { showInfo, closePanel } from './ui.js';
 export function initializeGraph(nodes, links) {
     // Color Mapping
     const colorScale = d3.scaleOrdinal()
-        .domain([1, 2, 3, 4])
-        .range(["#dc2626", "#9333ea", "#64748b", "#3b82f6"]);
+        .domain([1, 2, 3, 4, 5])
+        .range(["#dc2626", "#9333ea", "#64748b", "#3b82f6", "#cbd5e1"]);
 
     // Setup SVG
     const container = document.getElementById('graph-container');
