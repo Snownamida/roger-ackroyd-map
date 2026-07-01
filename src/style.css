@@ -86,11 +86,15 @@ body {
     margin-right: 6px;
 }
 
-/* Tooltip style for link relationships */
+/* Labels rendered on the relationship lines */
 .link-label {
-    font-size: 10px;
+    font-size: 11px;
     fill: #94a3b8;
-    background: #0f172a;
+    pointer-events: none;
+    paint-order: stroke;
+    stroke: #0f172a;
+    stroke-width: 3px;
+    stroke-linejoin: round;
 }
 
 /* Fade in animation */

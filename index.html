@@ -4,7 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>罗杰疑案 - 人物关系图 (无剧透)</title>
+    <title>罗杰疑案（The Murder of Roger Ackroyd）人物关系图 · 无剧透 | 阿加莎·克里斯蒂</title>
+    <meta name="description"
+        content="阿加莎·克里斯蒂经典侦探小说《罗杰疑案》的交互式人物关系图。默认无剧透，读完后可一键切换“真相模式”查看隐藏关系；支持拖拽节点、缩放平移，点击人物查看中英双语介绍。适合阅读时随手查阅的伴读工具。">
+    <link rel="canonical" href="https://roger-ackroyd-map.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="罗杰疑案（The Murder of Roger Ackroyd）人物关系图 · 无剧透">
+    <meta property="og:description" content="阿加莎·克里斯蒂《罗杰疑案》交互式人物关系图：无剧透伴读，可切换真相模式，支持拖拽与缩放。">
+    <meta property="og:url" content="https://roger-ackroyd-map.vercel.app/">
+    <meta property="og:locale" content="zh_CN">
+    <meta name="twitter:card" content="summary">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "罗杰疑案人物关系图（无剧透）",
+        "url": "https://roger-ackroyd-map.vercel.app/",
+        "applicationCategory": "ReferenceApplication",
+        "inLanguage": "zh-CN",
+        "isAccessibleForFree": true,
+        "about": {
+            "@type": "Book",
+            "name": "The Murder of Roger Ackroyd",
+            "alternateName": "罗杰疑案",
+            "author": { "@type": "Person", "name": "Agatha Christie", "alternateName": "阿加莎·克里斯蒂" }
+        }
+    }
+    </script>
     <!-- Tailwind is still useful for utility classes in the HTML structure -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,7 +39,7 @@
 
     <!-- UI Overlay -->
     <div class="absolute top-0 left-0 p-4 z-10 w-full pointer-events-none">
-        <div class="flex justify-between items-start pointer-events-auto">
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-between items-start pointer-events-auto">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-amber-500 tracking-wider font-serif">罗杰疑案</h1>
                 <h2 class="text-sm md:text-base text-slate-400 italic">The Murder of Roger Ackroyd</h2>
@@ -52,6 +78,34 @@
 
     <!-- Graph Container -->
     <div id="graph-container"></div>
+
+    <noscript>
+        <div style="position:relative;z-index:20;padding:2rem;color:#e2e8f0;">
+            本页面是《罗杰疑案》的交互式人物关系图，需要启用 JavaScript 才能查看图谱。
+        </div>
+    </noscript>
+
+    <!-- Footer: about / links (static, indexable) -->
+    <footer class="absolute bottom-2 left-0 w-full px-4 z-[5] pointer-events-none text-xs text-slate-500">
+        <div class="pointer-events-auto max-w-xl">
+            <details class="bg-slate-800/70 rounded px-2 py-1 backdrop-blur-sm">
+                <summary class="cursor-pointer select-none text-slate-400">关于本图 · About</summary>
+                <p class="mt-2 leading-relaxed text-slate-400">
+                    《罗杰疑案》（<em>The Murder of Roger Ackroyd</em>，1926）是阿加莎·克里斯蒂（Agatha
+                    Christie）最负盛名的侦探小说之一：芬利庄园的主人罗杰·艾克罗伊德遇害，退休隐居的大侦探赫尔克里·波洛重新出山调查。
+                    本页面将书中主要人物及其公开关系整理为一张可交互的关系图：拖拽节点整理布局，滚轮或双指缩放平移，点击人物查看介绍。
+                    默认视图<strong>不含任何剧透</strong>，读完全书后可点击“还原真相”查看隐藏的真实关系。
+                </p>
+                <p class="mt-2 text-slate-500">
+                    更多推理小说图谱：<a href="https://tmc.snownamida.top/"
+                        class="text-amber-500/80 hover:text-amber-400 underline">周四推理俱乐部第四部人物图谱</a>
+                    <span class="mx-1">·</span>
+                    <a href="https://ko-fi.com/snownamida" target="_blank" rel="noopener"
+                        class="text-amber-500/80 hover:text-amber-400 underline">☕ 请我喝咖啡</a>
+                </p>
+            </details>
+        </div>
+    </footer>
 
     <!-- Detail Panel -->
     <div id="info-panel">

@@ -80,8 +80,12 @@ export function initializeGraph(nodes, links) {
         simulation.force("link").links(links);
 
         // --- LINKS ---
+        // Key includes the label so parallel edges (e.g. a normal + a spoiler
+        // relationship between the same two people) don't collide and get dropped.
+        const linkKey = d => d.source.id + "-" + d.target.id + "-" + (d.label || "");
+
         link = g.selectAll(".link")
-            .data(links, d => d.source.id + "-" + d.target.id); // Key function is important
+            .data(links, linkKey);
 
         link.exit().remove();
 
@@ -96,6 +100,24 @@ export function initializeGraph(nodes, links) {
         link.attr("stroke", d => d.spoiler ? "#ef4444" : "#94a3b8") // Red for spoiler
             .attr("stroke-dasharray", d => d.spoiler ? "5,5" : null) // Dashed for spoiler
             .attr("opacity", 0.6);
+
+        // --- LINK LABELS ---
+        linkLabel = g.selectAll(".link-label")
+            .data(links, linkKey);
+
+        linkLabel.exit().remove();
+
+        const linkLabelEnter = linkLabel.enter().append("text")
+            .attr("class", "link-label")
+            .attr("text-anchor", "middle");
+
+        linkLabel = linkLabelEnter.merge(linkLabel);
+
+        linkLabel
+            .text(d => d.label || "")
+            // Offset spoiler labels below the line so parallel edges stay readable
+            .attr("dy", d => d.spoiler ? 14 : -5)
+            .attr("fill", d => d.spoiler ? "#f87171" : "#94a3b8");
 
         // --- NODES ---
         node = g.selectAll(".node")
@@ -155,6 +177,10 @@ export function initializeGraph(nodes, links) {
             .attr("y1", d => d.source.y)
             .attr("x2", d => d.target.x)
             .attr("y2", d => d.target.y);
+
+        linkLabel
+            .attr("x", d => (d.source.x + d.target.x) / 2)
+            .attr("y", d => (d.source.y + d.target.y) / 2);
 
         node
             .attr("transform", d => `translate(${d.x},${d.y})`);
