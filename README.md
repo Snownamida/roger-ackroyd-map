@@ -1,42 +1,44 @@
-# 罗杰疑案人物关系图（无剧透）
+**English** | [中文](README.zh-CN.md)
 
-阿加莎·克里斯蒂（Agatha Christie）经典侦探小说《罗杰疑案》（*The Murder of Roger Ackroyd*, 1926）的交互式人物关系图，专为**阅读伴读**设计：默认视图不含任何剧透，读完全书后可一键切换“真相模式”，查看隐藏人物与真实关系。
+# The Murder of Roger Ackroyd — Character Map (Spoiler-Free)
 
-**在线访问：<https://ackroyd.snownamida.top/>**
+An interactive character map for Agatha Christie's classic detective novel *The Murder of Roger Ackroyd* (1926), designed as a **reading companion**: the default view contains no spoilers whatsoever, and once you've finished the book you can flip on "Truth Mode" with a single click to reveal hidden characters and their real relationships.
 
-![人物关系图截图](docs/screenshot.png)
+**Live site: <https://ackroyd.snownamida.top/>**
 
-## 功能
+![Character map screenshot](docs/screenshot.png)
 
-- **无剧透默认视图**：只呈现书中公开的人物身份与关系
-- **真相模式**：一键还原隐藏人物、秘密关系与每个人的真实面目（红色虚线标注）
-- **交互式力导向图**：拖拽节点整理布局，滚轮 / 双指缩放平移
-- **人物详情**：点击节点查看中英双语人物介绍；真相模式下额外显示【真相】段落
-- **关系标注**：每条连线都标有关系说明（医生、继父子、未婚夫妻……）
+## Features
 
-真相模式效果：
+- **Spoiler-free default view**: shows only the characters' public identities and relationships as revealed in the book
+- **Truth Mode**: one click restores hidden characters, secret relationships, and everyone's true nature (marked with red dashed lines)
+- **Interactive force-directed graph**: drag nodes to arrange the layout, scroll / pinch to zoom and pan
+- **Character details**: click a node for a bilingual (English + Chinese) bio; Truth Mode adds an extra "Truth" section
+- **Relationship labels**: every edge is annotated with the relationship (doctor, stepfather & stepson, engaged couple, …)
 
-![真相模式截图](docs/screenshot-spoiler.png)
+Truth Mode in action:
 
-## 本地开发
+![Truth Mode screenshot](docs/screenshot-spoiler.png)
+
+## Local development
 
 ```bash
 npm install
-npm run dev      # 开发服务器
-npm run build    # 构建到 dist/
-npm run preview  # 预览构建产物
+npm run dev      # dev server
+npm run build    # build to dist/
+npm run preview  # preview the build
 ```
 
-技术栈：[Vite](https://vitejs.dev/) + [D3.js](https://d3js.org/)（力导向图）+ Tailwind CSS（CDN 工具类）。
+Tech stack: [Vite](https://vitejs.dev/) + [D3.js](https://d3js.org/) (force-directed graph) + Tailwind CSS (utility classes via CDN).
 
-## 相关项目
+## Related projects
 
-- [周四推理俱乐部第四部人物图谱（中英双语）](https://tmc.snownamida.top/) — 理查德·奥斯曼《The Last Devil to Die》
+- [The Thursday Murder Club (Book 4) character map — bilingual](https://tmc.snownamida.top/) — Richard Osman's *The Last Devil to Die*
 
-## 支持
+## Support
 
-如果这个小工具对你的阅读有帮助，欢迎 [☕ 请我喝咖啡](https://ko-fi.com/snownamida)。
+If this little tool helped your reading, feel free to [☕ buy me a coffee](https://ko-fi.com/snownamida).
 
-## 许可证
+## License
 
 [MIT](LICENSE) © Snownamida
