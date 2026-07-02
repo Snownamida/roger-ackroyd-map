@@ -2,7 +2,7 @@
 
 阿加莎·克里斯蒂（Agatha Christie）经典侦探小说《罗杰疑案》（*The Murder of Roger Ackroyd*, 1926）的交互式人物关系图，专为**阅读伴读**设计：默认视图不含任何剧透，读完全书后可一键切换“真相模式”，查看隐藏人物与真实关系。
 
-**在线访问：<https://roger-ackroyd-map.vercel.app/>**
+**在线访问：<https://ackroyd.snownamida.top/>**
 
 ![人物关系图截图](docs/screenshot.png)
 
